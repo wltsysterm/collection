@@ -16,6 +16,7 @@ public class CollectionUtil {
      */
     public static void main(String[] args) {
         List<Integer> list = (new LinkedList());
+        //浅拷贝 只拷贝引用
         Collections.addAll(list, new Integer[]{0,1, 2, 3, 4, 5, 6});
         debug("addAll",list);
         Collections.swap(list,0,1);
@@ -47,6 +48,7 @@ public class CollectionUtil {
 //        debug("fill",list);
         List<String> copyto = Arrays.asList("1,2,3,4,5,6,7,8,10".split(","));
         List<String> copyfrom = Arrays.asList("11,11,11".split(","));
+        //深拷贝 不仅拷贝引用还拷贝对象
         Collections.copy(copyto,copyfrom);
         debug("copy",copyto);
         int min = Collections.min(list);
