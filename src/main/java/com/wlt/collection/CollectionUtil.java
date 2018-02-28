@@ -2,6 +2,7 @@ package com.wlt.collection;
 
 import org.junit.Test;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -48,7 +49,7 @@ public class CollectionUtil {
 //        debug("fill",list);
         List<String> copyto = Arrays.asList("1,2,3,4,5,6,7,8,10".split(","));
         List<String> copyfrom = Arrays.asList("11,11,11".split(","));
-        //深拷贝 不仅拷贝引用还拷贝对象
+        //浅拷贝
         Collections.copy(copyto,copyfrom);
         debug("copy",copyto);
         int min = Collections.min(list);
@@ -81,6 +82,38 @@ public class CollectionUtil {
     private static void debug(String str,Object object){
         System.out.printf("%20s",str+":");
         System.out.println(object);
+    }
+
+    @Test
+    public void testCopy(){
+        System.out.println("Collections.copy--浅层拷贝====modify之前=");
+        WltCopy wltCopy = new WltCopy("wlt");
+        List list = new LinkedList(Arrays.asList(wltCopy));
+        //需要指定长度，不然会报错误IndexOutOfBoundsException
+        List listcopy = new LinkedList(Arrays.asList(new Object[list.size()]));
+        Collections.copy(listcopy,list);
+        debug("list",list);
+        debug("list-hashcode",list.hashCode());
+        debug("listcopy",listcopy);
+        debug("listcopy-hashcode",listcopy.hashCode());
+        System.out.println("Collections.copy--浅层拷贝====modify之后=");
+        ((WltCopy)list.get(0)).setName("wlt-modify");
+        debug("list",list);
+        debug("list-hashcode",list.hashCode());
+        debug("listcopy",listcopy);
+        debug("listcopy-hashcode",listcopy.hashCode());
+        System.out.println(" new  ArrayList(List c)--浅层拷贝====modify之前=");
+        List listnew = new LinkedList(list);
+        debug("list",list);
+        debug("list-hashcode",list.hashCode());
+        debug("listnew",listnew);
+        debug("listnew-hashcode",listnew.hashCode());
+        System.out.println(" new  ArrayList(List c)--浅层拷贝====modify之后=");
+        ((WltCopy)list.get(0)).setName("wlt-modify-new");
+        debug("list",list);
+        debug("list-hashcode",list.hashCode());
+        debug("listnew",listnew);
+        debug("listnew-hashcode",listnew.hashCode());
     }
     @Test
     public void test(){
@@ -121,5 +154,27 @@ class WltCallable implements Callable{
         System.out.print(Thread.currentThread().getName()+"===");
         collection.add(Thread.currentThread().getName());
         return null;
+    }
+}
+class WltCopy{
+    private String name;
+
+    public WltCopy(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "wltCopy{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

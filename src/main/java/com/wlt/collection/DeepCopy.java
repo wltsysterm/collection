@@ -1,54 +1,52 @@
 package com.wlt.collection;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 /**
+ * 集合的普通拷贝克隆复制都是浅层的，下面介绍一种基于对象流的深度拷贝
  * @author 魏霖涛
  * @since 2018/2/28 0028
  */
-public class Clone {
-    public static void main(String[] args) throws CloneNotSupportedException {
-        System.out.println("clone-对象使用-------------深度拷贝");
-        WltClone wltClone = new WltClone("wlt");
-        WltClone clone = wltClone.clone();
-        System.out.println("modify---之前");
-        System.out.println(wltClone.toString());
-        System.out.println(clone.toString());
-        System.out.println(wltClone.hashCode());
-        System.out.println(clone.hashCode());
-        wltClone.setName("modify-wlt");
-        System.out.println("modify---之后");
-        System.out.println(wltClone.toString());
-        System.out.println(clone.toString());
+public class DeepCopy {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+        WltDeepcopy wltClone = new WltDeepcopy("wlt");
 
-        System.out.println("clone-集合使用-------------浅层拷贝");
+        System.out.println("deepCopy-集合使用-------------深度拷贝");
         //Arrays.asList("1","2")返回的是只读的集合，而new ArrayList<>(Arrays.asList("1","2"))返回的是正常的集合
         ArrayList list = new ArrayList(Arrays.asList(wltClone,"2"));
-        ArrayList clonelist = (ArrayList) list.clone();
+        ArrayList clonelist = (ArrayList) deepCopyList(list);
         System.out.println("modify---之前");
         System.out.println(list);
         System.out.println(clonelist);
+        System.out.println(list.hashCode());
+        System.out.println(clonelist.hashCode());
         //下面这种是把集合元素的引用所指的对象属性改变，所以会引发连锁改变
-        ((WltClone)list.get(0)).setName("modify");
+        ((WltDeepcopy)list.get(0)).setName("modify");
         //下面这种是直接把集合的引用给改变了，所以不会引发连锁改变
 //        list.set(0,new WltClone("happy"));
         System.out.println("modify---之后");
         System.out.println(list);
         System.out.println(clonelist);
     }
-}
+    public static <T> List<T> deepCopyList(List<T> source) throws IOException, ClassNotFoundException {
+        List<T> target;
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+        objectOutputStream.writeObject(source);
 
-/**
- * 不实现Clonealbe接口就会报下面这个错误
- * Exception in thread "main" java.lang.CloneNotSupportedException: com.wlt.collection.WltClone
- */
-class WltClone implements Cloneable{
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+        target = (List<T>) objectInputStream.readObject();
+        return  target;
+    }
+}
+class WltDeepcopy implements Serializable{
     private String name;
 
-    public WltClone(String name) {
+    public WltDeepcopy(String name) {
         this.name = name;
     }
 
